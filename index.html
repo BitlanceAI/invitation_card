@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM Lead Entry Form</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef1f7;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4A6CF7;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #4A6CF7;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            background: #3d5bd3;
+        }
+
+        .success-box {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 6px;
+            color: #0a6d30;
+            background: #d7fbe3;
+            font-weight: bold;
+        }
+
+        .error-box {
+            display: none;
+            text-align: center;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            color: #9b1d1d;
+            background: #fde4e4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>CRM Lead Entry</h2>
+
+    <div id="success" class="success-box">✔ Lead Submitted Successfully!</div>
+    <div id="error" class="error-box">❌ Something went wrong. Try Again!</div>
+
+    <form id="crmForm">
+        <label>Customer Name</label>
+        <input type="text" id="customer_name" required placeholder="Enter customer name">
+
+        <label>Phone Number</label>
+        <input type="tel" id="phone" required placeholder="Enter phone number">
+
+        <label>Email ID (optional)</label>
+        <input type="email" id="email" placeholder="Enter email">
+
+        <label>Lead Source</label>
+        <select id="source">
+            <option value="Walk-in">Walk-in</option>
+            <option value="Website">Website</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Referral">Referral</option>
+            <option value="Other">Other</option>
+        </select>
+
+        <label>Requirement / Notes</label>
+        <textarea id="notes" rows="4" placeholder="Customer requirement details..."></textarea>
+
+        <label>Assign to Salesperson</label>
+        <select id="salesperson">
+            <option value="Amit">Amit</option>
+            <option value="Rahul">Rahul</option>
+            <option value="Priya">Priya</option>
+            <option value="Team">Team</option>
+        </select>
+
+        <button type="submit">Submit Lead</button>
+    </form>
+</div>
+
+<script>
+document.getElementById("crmForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    // Basic Validation
+    let name = document.getElementById("customer_name").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+    let email = document.getElementById("email").value.trim();
+
+    if (phone.length < 10 || isNaN(phone)) {
+        alert("Phone number must be valid (10 digits).");
+        return;
+    }
+
+    // Prepare Payload
+    let data = {
+        customer_name: name,
+        phone: phone,
+        email: email,
+        source: document.getElementById("source").value,
+        notes: document.getElementById("notes").value,
+        salesperson: document.getElementById("salesperson").value
+    };
+
+    try {
+        let response = await fetch(
+            "https://bitlanceai.app.n8n.cloud/webhook-test/enquiry",
+            {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            }
+        );
+
+        if (response.ok) {
+            document.getElementById("success").style.display = "block";
+            document.getElementById("error").style.display = "none";
+            document.getElementById("crmForm").reset();
+        } else {
+            document.getElementById("error").style.display = "block";
+            document.getElementById("success").style.display = "none";
+        }
+
+    } catch (err) {
+        document.getElementById("error").style.display = "block";
+        document.getElementById("success").style.display = "none";
+    }
+});
+</script>
+
+</body>
+</html>
